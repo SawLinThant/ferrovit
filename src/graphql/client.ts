@@ -7,7 +7,7 @@ import {
 } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import { RetryLink } from "@apollo/client/link/retry";
-import { GraphQLError, GraphQLFormattedError } from "graphql";
+import { GraphQLFormattedError } from "graphql";
 import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 import { cookies } from "next/headers";
 
