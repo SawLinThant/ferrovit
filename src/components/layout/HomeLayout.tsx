@@ -11,7 +11,7 @@ const HomeLayout = ({ children }: LayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col">
         <div className="flex flex-col bg-[url('/images/background.jpg')] bg-cover bg-center">
-        <Navbar />
+        <Navbar isHome={true}/>
         <HeroSection/>
         </div>
       <main className="flex-grow dark:bg-white">
@@ -22,4 +22,4 @@ const HomeLayout = ({ children }: LayoutProps) => {
   );
 };
 
-export default HomeLayout; 
+export default HomeLayout;

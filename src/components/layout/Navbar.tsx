@@ -2,10 +2,18 @@ import Link from 'next/link';
 import FacebookIcon from '../common/icons/facebook-icon';
 import InstagramIcon from '../common/icons/instagram-icons';
 import XIcon from '../common/icons/x-icon';
+import clsx from 'clsx';
 
-const Navbar = () => {
+interface NavbarProps {
+  isHome?: boolean;
+}
+
+const Navbar = ({isHome = false }: NavbarProps) => {
   return (
-    <nav className="flex items-center justify-center px-8 py-8 relative border-b border-gray-300">
+    <nav className={clsx("flex items-center justify-center px-8 py-8 relative border-b border-gray-300",{
+      "bg-[#F12E2A]": !isHome,
+      "bg-transparent": isHome,
+    })}>
       <div className="absolute inset-0"></div>
       
       <div className='container flex items-center justify-between relative z-10'>

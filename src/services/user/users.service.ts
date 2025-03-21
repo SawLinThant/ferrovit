@@ -1,5 +1,5 @@
-import { CreateUserInput, User } from '@/entities/users';
-import { UserRepository } from './user.repository';
+import { CreateUserInput, User } from '@/entities/users.entity';
+import { UserRepository } from './users.repository';
 
 export class UserService {
   private repository: UserRepository;
@@ -46,7 +46,6 @@ export class UserService {
       name: input.name.trim(),
       email: input.email.toLowerCase(),
       phone: input.phone || null,
-      gender: input.gender || "",
     };
 
     return await this.repository.createUser(sanitizedInput);

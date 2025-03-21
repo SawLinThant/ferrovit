@@ -121,19 +121,20 @@ let apolloClient: ApolloClient<any> | null = null;
  * @param initialConfig - Optional initial configuration
  * @returns Apollo Client instance
  */
-export const getApolloClient = (
+export const getApolloClient = async (
   initialConfig?: Partial<ApolloClientConfig>
-): ApolloClient<any> => {
+): Promise<ApolloClient<any>> => {
   const isServer = typeof window === "undefined";
   let authToken =
     initialConfig?.authToken ?? process.env.NEXT_PUBLIC_AUTH_TOKEN;
 
   if (isServer) {
     try {
-      const cookieStore = cookies() as unknown as ReadonlyRequestCookies;
-      authToken = cookieStore.get("auth_token")?.value ?? authToken;
+      const cookieStore = await cookies();
+      const authCookie = cookieStore.get("auth_token");
+      authToken = authCookie?.value ?? authToken;
     } catch (error) {
-      logger.error("Failed to access cookies synchronously", error);
+      logger.error("Failed to access cookies", error);
     }
   }
 
@@ -156,4 +157,16 @@ export const getApolloClient = (
   return apolloClient;
 };
 
-export const client = getApolloClient();
+// Create a synchronous version for client-side usage
+export const getClientApolloClient = (): ApolloClient<any> => {
+  if (!apolloClient) {
+    apolloClient = createApolloClient({
+      uri: process.env.NEXT_PUBLIC_GRAPHQL_API as string,
+      isServer: false,
+    });
+  }
+  return apolloClient;
+};
+
+// Export a default client for client-side usage
+export const client = getClientApolloClient();

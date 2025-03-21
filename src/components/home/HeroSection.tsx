@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 const HeroSection = () => {
   return (
@@ -28,9 +29,9 @@ const HeroSection = () => {
             Millions of women trust FERROVIT, a source of high quality iron and
             essential nutrients which helps to combat iron deficiency anaemia.
           </p>
-          <button className="bg-white text-red-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors">
+          <Link href="/survey/page1" className="bg-white text-red-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors">
             Take Quiz
-          </button>
+          </Link>
         </div>
       </div>
     </div>
