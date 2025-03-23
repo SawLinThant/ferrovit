@@ -54,7 +54,11 @@ const mockRelatedPosts: RelatedPost[] = [
   },
 ];
 
-export default function BlogDetail({ params }: { params: { slug: string } }) {
+type Params = Promise<{ slug: string }>;
+
+export default async function BlogDetail({ params }: { params: Params }) {
+  const resolvedParams = await params; // Await the params Promise
+  const { slug } = resolvedParams;
   const blogPost: BlogPost = {
     title:
       "Empowering Women's Health: Overcoming Iron Deficiency with Supplements",
@@ -96,16 +100,16 @@ Iron supplements have emerged as a reliable solution for managing iron deficienc
                 <div className="w-10 h-10 rounded-lg border border-red-600 flex items-center rotate-180 justify-center bg-red-600 text-red-500 hover:bg-red-600 hover:text-white hover:cursor-pointer">
                   <ChevronRightIcon height="10" width="10" color="white" />
                 </div>
-                READ PREVIOUS
+               <span className="hidden md:block">READ PREVIOUS</span>
               </Link>
-              <span className="inline-block bg-red-600 text-white px-6 py-2 rounded-md font-medium text-sm mb-4">
+              <span className="inline-block bg-red-600 text-white px-6 py-2 rounded-md font-medium text-sm">
                 {blogPost.category}
               </span>
               <Link
                 href="#"
                 className="flex gap-3 items-center font-semibold text-gray-400 hover:text-red-600 text-sm"
               >
-                READ NEXT
+                <span className="hidden md:block">READ NEXT</span>
                 <div className="w-10 h-10 rounded-lg border border-red-600 flex items-center justify-center bg-red-600 text-red-500 hover:bg-red-600 hover:text-white hover:cursor-pointer">
                   <ChevronRightIcon height="10" width="10" color="white" />
                 </div>
@@ -124,52 +128,14 @@ Iron supplements have emerged as a reliable solution for managing iron deficienc
           </div>
 
           {/* Blog Image */}
-          <div className="relative w-full h-[400px] mb-12">
+          <div className="relative w-full h-[600px] mb-12">
             <Image
               src="/images/background.jpg"
               alt={blogPost.title}
               fill
-              className="object-cover"
+              className="md:object-contain object-cover"
             />
           </div>
-
-          {/* <div className="fixed left-8 top-1/2 transform -translate-y-1/2 space-y-4">
-            <Link
-              href="#"
-              className="w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center hover:bg-gray-50"
-            >
-              <Image
-                src="/images/facebook.svg"
-                alt="Share on Facebook"
-                width={20}
-                height={20}
-              />
-            </Link>
-            <Link
-              href="#"
-              className="w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center hover:bg-gray-50"
-            >
-              <Image
-                src="/images/twitter.svg"
-                alt="Share on Twitter"
-                width={20}
-                height={20}
-              />
-            </Link>
-            <Link
-              href="#"
-              className="w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center hover:bg-gray-50"
-            >
-              <Image
-                src="/images/instagram.svg"
-                alt="Share on Instagram"
-                width={20}
-                height={20}
-              />
-            </Link>
-          </div> */}
-
-          {/* Blog Content */}
           <div className="relative max-w-3xl mx-auto prose prose-lg">
             <div className="absolute left-8 top-0 transform -translate-x-36 space-y-4 py-4 px-2 bg-[#F1F3F8]">
               <Link
@@ -191,7 +157,19 @@ Iron supplements have emerged as a reliable solution for managing iron deficienc
                 <InstagramIcon width="20" height="20" color="#000" />
               </Link>
             </div>
-            <div className="whitespace-pre-wrap">{blogPost.content}</div>
+            <div className="flex flex-col gap-8">
+              <div className="whitespace-pre-wrap">
+                {blogPost.content.split(/\s+/).slice(0, 50).join(" ")}
+              </div>
+              <div className="w-full p-6 rounded-md bg-[#F1F3F8] font-semibold">
+                <p className="text-xl">
+                  {`"Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis, qui. In reprehenderit commodi dolores quia deleniti neque explicabo sed ad quod, iure laudantium delectus, quisquam itaque fugiat repellendus. Tempore, quis?"`}
+                </p>
+              </div>
+              <div className="whitespace-pre-wrap">
+                {blogPost.content.split(/\s+/).slice(50).join(" ")}
+              </div>
+            </div>
           </div>
         </div>
         {/* Related Posts */}

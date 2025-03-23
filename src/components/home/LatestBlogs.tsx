@@ -7,11 +7,13 @@ const BlogCard = ({
   title,
   excerpt,
   imageUrl,
+  url,
 }: {
   category: string;
   title: string;
   excerpt: string;
   imageUrl: string;
+  url: string;
 }) => (
   <div className="bg-white rounded-lg overflow-hidden shadow-lg">
     <Image
@@ -25,7 +27,7 @@ const BlogCard = ({
       <span className="text-sm text-gray-500 uppercase">{category}</span>
       <h3 className="text-xl font-semibold">{title}</h3>
       <p className="text-gray-600">{excerpt}</p>
-      <Link href="#" className="text-red-600 font-semibold hover:text-red-700">
+      <Link href={url} className="text-red-600 font-semibold hover:text-red-700">
         READ MORE
       </Link>
     </div>
@@ -40,6 +42,7 @@ const LatestBlogs = () => {
       excerpt:
         "Lorem ipsum dolor sit amet consectetur. Eget odio elio ac eros nunc. Lorem maecenas mattis morbi pretium nulla morbi pretium nulla.",
       imageUrl: "/images/blog-sample.png",
+      url: "/blogs/1",
     },
     {
       category: "CATEGORY",
@@ -47,6 +50,7 @@ const LatestBlogs = () => {
       excerpt:
         "Lorem ipsum dolor sit amet consectetur. Eget odio elio ac eros nunc. Lorem maecenas mattis morbi pretium nulla.",
       imageUrl: "/images/blog-sample.png",
+      url: "/blogs/2",
     },
     {
       category: "CATEGORY",
@@ -54,6 +58,7 @@ const LatestBlogs = () => {
       excerpt:
         "Lorem ipsum dolor sit amet consectetur. Eget odio elio ac eros nunc. Lorem maecenas mattis morbi pretium nulla.",
       imageUrl: "/images/blog-sample.png",
+      url: "/blogs/3",
     },
     {
       category: "CATEGORY",
@@ -61,6 +66,7 @@ const LatestBlogs = () => {
       excerpt:
         "Lorem ipsum dolor sit amet consectetur. Eget odio elio ac eros nunc. Lorem maecenas mattis morbi pretium nulla.",
       imageUrl: "/images/blog-sample.png",
+      url: "/blogs/4",
     },
   ];
 

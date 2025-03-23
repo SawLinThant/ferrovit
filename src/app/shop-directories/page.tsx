@@ -64,14 +64,12 @@ const stores = [
   },
 ];
 
-interface PageProps {
-  searchParams: { [key: string]: string | undefined };
-}
+type SearchParamsType = Promise<{ township?: string }>;
 
-export default async function ShopDirectories({ searchParams }: PageProps) {
-  const selectedTownship = searchParams.township;
+export default async function ShopDirectories({ searchParams }: { searchParams: SearchParamsType }) {
+  const resolvedSearchParams = await searchParams;
+  const selectedTownship = resolvedSearchParams.township;
 
-  // Filter stores based on selected township
   const filteredStores = selectedTownship
     ? stores.filter(store => store.address.includes(selectedTownship))
     : stores;
