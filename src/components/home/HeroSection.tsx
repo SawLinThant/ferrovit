@@ -29,7 +29,7 @@ const HeroSection = () => {
             Millions of women trust FERROVIT, a source of high quality iron and
             essential nutrients which helps to combat iron deficiency anaemia.
           </p>
-          <Link href="/survey/page1" className="bg-white text-red-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors">
+          <Link href="/survey/page1" className="bg-[#F12E2A] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#F12E2A]/80 transition-colors shadow-lg">
             Take Quiz
           </Link>
         </div>
