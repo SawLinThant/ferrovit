@@ -1,12 +1,19 @@
-import { CreateQuizUserInput, QuizUser } from "@/entities/quiz_users.entity";
+import { CreateQuizUserInput, QuizUser, QuizUsersResponse } from "@/entities/quiz_users.entity";
 import { CREATE_QUIZ_USER } from "@/graphql/mutation/quiz_users.mutation";
-import { GET_ALL_QUIZ_USERS, GET_QUIZ_USER_BY_ID } from "@/graphql/query/quiz_users.query";
+import { GET_ALL_QUIZ_USERS, GET_FILTERED_QUIZ_USERS, GET_QUIZ_USER_BY_ID } from "@/graphql/query/quiz_users.query";
 import {
   ApolloClient,
   ApolloError,
   ServerError,
   ServerParseError,
 } from "@apollo/client";
+
+interface FetchQuizUsersParams {
+  phone?: string;
+  created_at?: string;
+  offset?: number;
+  limit?: number;
+}
 
 export class QuizUserRepository {
   private client: ApolloClient<any>;
@@ -67,6 +74,53 @@ export class QuizUserRepository {
         errorMessage: "Failed to create quiz user",
         graphQLErrors: error instanceof ApolloError ? error.graphQLErrors : [],
         networkError: this.getNetworkError(error),
+      });
+    }
+  }
+
+  async fetchQuizUsers({
+    phone,
+    created_at,
+    offset = 0,
+    limit = 10,
+  }: FetchQuizUsersParams): Promise<QuizUsersResponse> {
+    try {
+      const where: any = {};
+      if (phone) {
+        where.phone = { _eq: phone };
+      }
+      if (created_at) {
+        const startOfDay = `${created_at}T00:00:00Z`;
+        const endOfDay = `${created_at}T23:59:59Z`;
+        where.created_at = { _gte: startOfDay, _lte: endOfDay }; 
+      }
+
+      const { data } = await this.client.query<{
+        quiz_users: QuizUser[];
+        quiz_users_aggregate: { aggregate: { count: number } };
+      }>({
+        query: GET_FILTERED_QUIZ_USERS,
+        variables: {
+          where,
+          offset,
+          limit,
+        },
+        fetchPolicy: "network-only", 
+      });
+
+      if (!data?.quiz_users) {
+        throw new Error("No quiz users returned from query");
+      }
+
+      return {
+        quiz_users: data.quiz_users,
+        total_count: data.quiz_users_aggregate.aggregate.count,
+      };
+    } catch (error) {
+      throw new ApolloError({
+        errorMessage: "Failed to fetch quiz users",
+        graphQLErrors: error instanceof ApolloError ? error.graphQLErrors : [],
+        networkError: error instanceof ApolloError ? error.networkError : null,
       });
     }
   }

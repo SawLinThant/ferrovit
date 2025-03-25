@@ -25,3 +25,23 @@ export const GET_QUIZ_USER_BY_ID = gql`
     }
   }
 `;
+
+export const GET_FILTERED_QUIZ_USERS = gql`
+  query GetQuizUsersWithResponses(
+    $where: quiz_users_bool_exp!
+    $offset: Int
+    $limit: Int
+  ) {
+    quiz_users(where: $where, offset: $offset, limit: $limit) {
+      id
+      phone
+      address
+      created_at
+    }
+    user_responses_aggregate(where: { quiz_user: { $where } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+`;

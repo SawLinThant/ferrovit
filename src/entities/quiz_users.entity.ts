@@ -13,3 +13,8 @@ export interface QuizUser {
     phone: string;
     address: string;
   }
+
+  export interface QuizUsersResponse {
+    quiz_users: QuizUser[];
+    total_count: number; 
+  }

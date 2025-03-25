@@ -1,5 +1,12 @@
-import { CreateQuizUserInput, QuizUser } from '@/entities/quiz_users.entity';
+import { CreateQuizUserInput, QuizUser, QuizUsersResponse } from '@/entities/quiz_users.entity';
 import { QuizUserRepository } from './quiz_users.repository';
+
+interface FetchQuizUsersParams {
+  phone?: string;
+  created_at?: string; 
+  page?: number;
+  pageSize?: number;
+}
 
 export class QuizUserService {
   private repository: QuizUserRepository;
@@ -38,9 +45,6 @@ export class QuizUserService {
     if (!input.address) {
       throw new Error('Address is required');
     }
-    // if (!/^\+?[1-9]\d{1,14}$/.test(input.phone)) {
-    //   throw new Error('Invalid phone number format');
-    // }
 
     const sanitizedInput: CreateQuizUserInput = {
       first_name: input.first_name?.trim() || null,
@@ -50,5 +54,25 @@ export class QuizUserService {
     };
 
     return await this.repository.createQuizUser(sanitizedInput);
+  }
+
+  async getFilteredQuizUserse({
+    phone,
+    created_at,
+    page = 1,
+    pageSize = 10,
+  }: FetchQuizUsersParams): Promise<QuizUsersResponse> {
+    if (!phone && !created_at) {
+      throw new Error("At least one filter (phone or date) is required");
+    }
+
+    const offset = (page - 1) * pageSize;
+
+    return await this.repository.fetchQuizUsers({
+      phone,
+      created_at,
+      offset,
+      limit: pageSize,
+    });
   }
 }
