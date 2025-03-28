@@ -4,6 +4,7 @@ import { QuizUserRepository } from './quiz_users.repository';
 interface FetchQuizUsersParams {
   phone?: string;
   created_at?: string; 
+  address?: string;
   page?: number;
   pageSize?: number;
 }
@@ -59,18 +60,17 @@ export class QuizUserService {
   async getFilteredQuizUserse({
     phone,
     created_at,
+    address,
     page = 1,
     pageSize = 10,
   }: FetchQuizUsersParams): Promise<QuizUsersResponse> {
-    if (!phone && !created_at) {
-      throw new Error("At least one filter (phone or date) is required");
-    }
 
     const offset = (page - 1) * pageSize;
 
     return await this.repository.fetchQuizUsers({
       phone,
       created_at,
+      address,
       offset,
       limit: pageSize,
     });

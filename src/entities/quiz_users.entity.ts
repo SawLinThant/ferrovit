@@ -1,10 +1,17 @@
 export interface QuizUser {
     id: string;
-    first_name?: string | null; 
-    last_name?: string | null;  
+    first_name: string | null;
+    last_name: string | null;
     phone: string;
     address: string;
-    created_at: string; 
+    created_at: string;
+    is_active: boolean;
+    results: {
+        id: string;
+        quiz_user_id: string;
+        total_points: number;
+        health_status: string;
+    }[];
   }
   
   export interface CreateQuizUserInput {

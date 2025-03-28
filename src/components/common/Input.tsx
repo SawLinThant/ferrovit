@@ -5,6 +5,8 @@ interface InputProps {
   placeholder?: string;
   required?: boolean;
   className?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const Input = ({ 
@@ -13,7 +15,9 @@ const Input = ({
   type = "text", 
   placeholder, 
   required = false,
-  className = ""
+  className = "",
+  value,
+  onChange
 }: InputProps) => {
   return (
     <div className="mb-4">
@@ -26,6 +30,8 @@ const Input = ({
         name={name}
         placeholder={placeholder}
         required={required}
+        value={value}
+        onChange={onChange}
         className={`w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent ${className}`}
       />
     </div>

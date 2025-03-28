@@ -10,6 +10,7 @@ import {
 
 interface FetchQuizUsersParams {
   phone?: string;
+  address?: string;
   created_at?: string;
   offset?: number;
   limit?: number;
@@ -81,6 +82,7 @@ export class QuizUserRepository {
   async fetchQuizUsers({
     phone,
     created_at,
+    address,
     offset = 0,
     limit = 10,
   }: FetchQuizUsersParams): Promise<QuizUsersResponse> {
@@ -89,11 +91,20 @@ export class QuizUserRepository {
       if (phone) {
         where.phone = { _eq: phone };
       }
+      if (address) {
+        where.address = { _eq: address };
+      }
       if (created_at) {
         const startOfDay = `${created_at}T00:00:00Z`;
         const endOfDay = `${created_at}T23:59:59Z`;
         where.created_at = { _gte: startOfDay, _lte: endOfDay }; 
       }
+
+      console.log('Fetching quiz users with params:', {
+        where,
+        offset,
+        limit,
+      });
 
       const { data } = await this.client.query<{
         quiz_users: QuizUser[];
@@ -105,7 +116,8 @@ export class QuizUserRepository {
           offset,
           limit,
         },
-        fetchPolicy: "network-only", 
+        fetchPolicy: "network-only",
+        errorPolicy: "all",
       });
 
       if (!data?.quiz_users) {
@@ -117,6 +129,7 @@ export class QuizUserRepository {
         total_count: data.quiz_users_aggregate.aggregate.count,
       };
     } catch (error) {
+      console.error('Error fetching quiz users:', error);
       throw new ApolloError({
         errorMessage: "Failed to fetch quiz users",
         graphQLErrors: error instanceof ApolloError ? error.graphQLErrors : [],

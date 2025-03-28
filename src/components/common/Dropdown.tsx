@@ -10,6 +10,8 @@ interface DropdownProps {
   required?: boolean;
   placeholder?: string;
   className?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
 const Dropdown = ({
@@ -18,7 +20,9 @@ const Dropdown = ({
   options,
   required = false,
   placeholder = "Choose",
-  className = ""
+  className = "",
+  value,
+  onChange
 }: DropdownProps) => {
   return (
     <div className="mb-4">
@@ -29,6 +33,8 @@ const Dropdown = ({
         id={name}
         name={name}
         required={required}
+        value={value}
+        onChange={onChange}
         className={`w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent bg-white ${className}`}
       >
         <option value="">{placeholder}</option>
