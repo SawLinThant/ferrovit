@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ChevronRightIcon from "../common/icons/cheveron-right";
 
-const BlogCard = ({
+export const BlogCard = ({
   category,
   title,
   excerpt,

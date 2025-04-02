@@ -39,10 +39,10 @@ const Navbar = ({ isHome = false }: NavbarProps) => {
             <Link href="/" className="hover:text-gray-200">
               Home
             </Link>
-            <Link href="/about" className="hover:text-gray-200">
+            <Link href="/about-us" className="hover:text-gray-200">
               About
             </Link>
-            <Link href="/blogs" className="hover:text-gray-200">
+            <Link href="/blogs/list" className="hover:text-gray-200">
               Blogs
             </Link>
             <Link href="/shop-directories" className="hover:text-gray-200">
