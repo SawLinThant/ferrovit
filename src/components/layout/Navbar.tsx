@@ -111,7 +111,7 @@ const Navbar = ({ isHome = false }: NavbarProps) => {
             <Link href="/" className="hover:text-gray-200 text-lg">
               Home
             </Link>
-            <Link href="/about" className="hover:text-gray-200 text-lg">
+            <Link href="/about-us" className="hover:text-gray-200 text-lg">
               About
             </Link>
             <Link href="/blogs" className="hover:text-gray-200 text-lg">
@@ -129,7 +129,7 @@ const Navbar = ({ isHome = false }: NavbarProps) => {
 
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 backdrop-blur-sm bg-opacity-50 z-40 md:hidden"
           onClick={toggleSidebar}
         />
       )}

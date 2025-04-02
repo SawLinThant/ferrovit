@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import BlogCard from "@/components/blog/BlogCard";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import ChevronRightIcon from "@/components/common/icons/cheveron-right";
@@ -10,6 +9,7 @@ import InstagramIcon from "@/components/common/icons/instagram-icons";
 import { BlogRepository } from "@/services/blogs/blogs.repository";
 import { BlogService } from "@/services/blogs/blogs.service";
 import { client } from "@/graphql/client";
+import { BlogCard } from "@/components/home/LatestBlogs";
 
 interface RelatedPost {
   slug: string;
@@ -17,37 +17,6 @@ interface RelatedPost {
   excerpt: string;
   image: string;
 }
-
-const mockRelatedPosts: RelatedPost[] = [
-  {
-    slug: "post-1",
-    title: "Lorem ipsum dolor sit amet consectetur. Tincidunt mi a.",
-    excerpt:
-      "Lorem ipsum dolor sit amet consectetur. Eget odio elio ac eros nunc. Lorem maecenas mattis morbi pretium nulla.",
-    image: "/images/blog-sample.png",
-  },
-  {
-    slug: "post-2",
-    title: "Lorem ipsum dolor sit amet consectetur. Tincidunt mi a.",
-    excerpt:
-      "Lorem ipsum dolor sit amet consectetur. Eget odio elio ac eros nunc. Lorem maecenas mattis morbi pretium nulla.",
-    image: "/images/blog-sample.png",
-  },
-  {
-    slug: "post-3",
-    title: "Lorem ipsum dolor sit amet consectetur. Tincidunt mi a.",
-    excerpt:
-      "Lorem ipsum dolor sit amet consectetur. Eget odio elio ac eros nunc. Lorem maecenas mattis morbi pretium nulla.",
-    image: "/images/blog-sample.png",
-  },
-  {
-    slug: "post-4",
-    title: "Lorem ipsum dolor sit amet consectetur. Tincidunt mi a.",
-    excerpt:
-      "Lorem ipsum dolor sit amet consectetur. Eget odio elio ac eros nunc. Lorem maecenas mattis morbi pretium nulla.",
-    image: "/images/blog-sample.png",
-  },
-];
 
 type Params = Promise<{ slug: string }>;
 
@@ -60,6 +29,10 @@ export default async function BlogDetail({ params }: { params: Params }) {
   const currentIndex = allBlogs.findIndex(
     (blog) => blog.id === resolvedParams.slug
   );
+
+  const relatedBlogs = allBlogs.filter(
+    (blog) => blog.id !== resolvedParams.slug
+  ).slice(0,8);
 
   const previousBlog = currentIndex > 0 ? allBlogs[currentIndex - 1] : null;
   const nextBlog =
@@ -88,7 +61,7 @@ export default async function BlogDetail({ params }: { params: Params }) {
             <div className="w-full flex flex-row items-center justify-between">
               {previousBlog ? (
                 <Link
-                  href={`/blogs/${previousBlog.id}`} 
+                  href={`/blogs/${previousBlog.id}`}
                   className="flex gap-3 items-center font-semibold text-gray-400 hover:text-red-600 text-sm"
                 >
                   <div className="w-10 h-10 rounded-lg border border-red-600 flex items-center rotate-180 justify-center bg-red-600 text-red-500 hover:bg-red-600 hover:text-white hover:cursor-pointer">
@@ -114,7 +87,7 @@ export default async function BlogDetail({ params }: { params: Params }) {
 
               {nextBlog ? (
                 <Link
-                  href={`/blogs/${nextBlog.id}`} 
+                  href={`/blogs/${nextBlog.id}`}
                   className="flex gap-3 items-center font-semibold text-gray-400 hover:text-red-600 text-sm"
                 >
                   <span className="hidden md:block">READ NEXT</span>
@@ -210,8 +183,15 @@ export default async function BlogDetail({ params }: { params: Params }) {
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {mockRelatedPosts.map((post) => (
-                  <BlogCard key={post.slug} {...post} />
+                {relatedBlogs.map((blog) => (
+                  <BlogCard
+                    key={blog.id}
+                    title={blog.title}
+                    category={blog.subtitle || ""}
+                    excerpt={blog.highlight_text || ""}
+                    imageUrl="/images/blog-sample.png"
+                    url={`/blogs/${blog.id}`}
+                  />
                 ))}
               </div>
             </div>

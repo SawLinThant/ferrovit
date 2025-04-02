@@ -12,21 +12,6 @@ const HeroSection = () => {
             fill
             className="object-contain"
           />
-          {/* <div className="absolute top-4 left-4 text-white text-lg font-bold">
-            <p>သင့်ကျန်းမာရေးကို</p>
-            <p>ဂရုစိုက်ပါ</p>
-            <p>ဖြည့်စွမ်းပေးမည်</p>
-          </div> */}
-
-          {/* <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/50 to-transparent p-4 flex items-center">
-            <Image
-              src="/images/ferrovit-c.png" 
-              alt="Ferrovit-C Product"
-              width={80}
-              height={80}
-              className="mr-4"
-            />
-          </div> */}
         </div>
 
         <div className="w-full md:w-1/2 flex flex-col gap-4">

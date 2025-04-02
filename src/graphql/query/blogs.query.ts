@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const GET_ALL_BLOGS = gql`
   query GetAllBlogs {
-    blogs {
+    blogs(order_by: { created_at: desc }) {
       id
       title
       subtitle
