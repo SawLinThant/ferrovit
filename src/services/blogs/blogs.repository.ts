@@ -1,6 +1,6 @@
-import { CreateUserInput, User } from "@/entities/users";
-import { CREATE_USER } from "@/graphql/mutation/users.mutation";
-import { GET_ALL_USERS, GET_USER_BY_ID } from "@/graphql/query/users.query";
+import { CreateBlogInput, Blog } from "@/entities/blogs.entity";
+import { CREATE_BLOG } from "@/graphql/mutation/blogs.mutation";
+import { GET_ALL_BLOGS, GET_BLOG_BY_ID } from "@/graphql/query/blogs.query";
 import {
   ApolloClient,
   ApolloError,
@@ -8,63 +8,63 @@ import {
   ServerParseError,
 } from "@apollo/client";
 
-export class UserRepository {
+export class BlogRepository {
   private client: ApolloClient<any>;
 
   constructor(client: ApolloClient<any>) {
     this.client = client;
   }
 
-  async fetchAllUsers(): Promise<User[]> {
+  async fetchAllBlogs(): Promise<Blog[]> {
     try {
-      const { data } = await this.client.query<{ users: User[] }>({
-        query: GET_ALL_USERS,
+      const { data } = await this.client.query<{ blogs: Blog[] }>({
+        query: GET_ALL_BLOGS,
         fetchPolicy: "network-only",
       });
-      return data.users;
+      return data.blogs;
     } catch (error) {
       throw new ApolloError({
-        errorMessage: "Failed to fetch all users",
+        errorMessage: "Failed to fetch all blogs",
         graphQLErrors: error instanceof ApolloError ? error.graphQLErrors : [],
         networkError: this.getNetworkError(error),
       });
     }
   }
 
-  async fetchUserById(id: string): Promise<User | null> {
+  async fetchBlogById(id: string): Promise<Blog | null> {
     try {
-      const { data } = await this.client.query<{ users_by_pk: User | null }>({
-        query: GET_USER_BY_ID,
+      const { data } = await this.client.query<{ blogs_by_pk: Blog | null }>({
+        query: GET_BLOG_BY_ID,
         variables: { id },
         fetchPolicy: "network-only",
       });
-      return data.users_by_pk;
+      return data.blogs_by_pk;
     } catch (error) {
       throw new ApolloError({
-        errorMessage: `Failed to fetch user with ID: ${id}`,
+        errorMessage: `Failed to fetch blog with ID: ${id}`,
         graphQLErrors: error instanceof ApolloError ? error.graphQLErrors : [],
         networkError: this.getNetworkError(error),
       });
     }
   }
 
-  async createUser(input: CreateUserInput): Promise<User> {
+  async createBlog(input: CreateBlogInput): Promise<Blog> {
     try {
       const { data } = await this.client.mutate<{
-        insert_users_one: User;
+        insert_blogs_one: Blog;
       }>({
-        mutation: CREATE_USER,
+        mutation: CREATE_BLOG,
         variables: { input },
       });
 
-      if (!data?.insert_users_one) {
-        throw new Error("User creation returned no data");
+      if (!data?.insert_blogs_one) {
+        throw new Error("Blog creation returned no data");
       }
 
-      return data.insert_users_one;
+      return data.insert_blogs_one;
     } catch (error) {
       throw new ApolloError({
-        errorMessage: "Failed to create user",
+        errorMessage: "Failed to create blog",
         graphQLErrors: error instanceof ApolloError ? error.graphQLErrors : [],
         networkError: this.getNetworkError(error),
       });

@@ -4,16 +4,17 @@ import {
   HttpLink,
   ApolloLink,
   from,
+  FetchPolicy,
 } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import { RetryLink } from "@apollo/client/link/retry";
-import { GraphQLError, GraphQLFormattedError } from "graphql";
-import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
-import { cookies } from "next/headers";
+import { GraphQLFormattedError } from "graphql";
 
 const logger = {
   error: (message: string, ...args: any[]) =>
     console.error(`[Apollo] ${message}`, ...args),
+  info: (message: string, ...args: any[]) =>
+    console.info(`[Apollo] ${message}`, ...args),
 };
 
 interface ApolloClientConfig {
@@ -38,6 +39,14 @@ const createApolloClient = (config: ApolloClientConfig): ApolloClient<any> => {
   const httpLink = new HttpLink({
     uri,
     credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...(authToken && { Authorization: `Bearer ${authToken}` }),
+    },
+    fetchOptions: {
+      mode: "cors",
+      credentials: "include",
+    },
   });
 
   const authLink = new ApolloLink((operation, forward) => {
@@ -64,8 +73,19 @@ const createApolloClient = (config: ApolloClientConfig): ApolloClient<any> => {
       );
     }
     if (networkError) {
-      logger.error(`Network Error: ${networkError.message}`, {
+      const error = networkError as any;
+      console.log("error", error);
+      logger.error(`Network Error: ${error}`, {
         operation: operation.operationName,
+        statusCode: error.statusCode,
+        name: error.name,
+        stack: error.stack,
+        result: error.result,
+        response: error.response,
+        request: {
+          uri: operation.getContext().uri,
+          headers: operation.getContext().headers,
+        }
       });
     }
   });
@@ -78,82 +98,77 @@ const createApolloClient = (config: ApolloClientConfig): ApolloClient<any> => {
     },
     attempts: {
       max: isServer ? 0 : retryAttempts,
-      retryIf: (error) => !!error && error.statusCode >= 500,
+      retryIf: (error) => {
+        const statusCode = (error as any).statusCode;
+        return statusCode >= 500 || statusCode === 429;
+      },
     },
   });
 
   const link = from([errorLink, retryLink, authLink, httpLink]);
 
-  const cache = new InMemoryCache({
-    typePolicies: {
-      Query: {
-        fields: {
-          users: {
-            merge(existing = [], incoming) {
-              return [...existing, ...incoming];
-            },
-          },
-        },
-      },
-    },
-  });
+  const cache = new InMemoryCache();
 
   return new ApolloClient({
     link,
     cache,
+    ssrMode: isServer,
     defaultOptions: {
       watchQuery: {
-        fetchPolicy: "cache-and-network",
+        fetchPolicy: (isServer ? "no-cache" : "cache-and-network") as FetchPolicy,
         errorPolicy: "all",
       },
       query: {
-        fetchPolicy: isServer ? "network-only" : "cache-only",
+        fetchPolicy: (isServer ? "no-cache" : "cache-and-network") as FetchPolicy,
         errorPolicy: "all",
       },
     },
   });
 };
 
-let apolloClient: ApolloClient<any> | null = null;
+let clientInstance: ApolloClient<any> | null = null;
+let serverInstance: ApolloClient<any> | null = null;
 
 /**
- * Gets or initializes the Apollo Client
- * @param initialConfig - Optional initial configuration
- * @returns Apollo Client instance
+ * Gets or creates a server-side Apollo Client instance
  */
-export const getApolloClient = (
+export const getServerApolloClient = async (
   initialConfig?: Partial<ApolloClientConfig>
-): ApolloClient<any> => {
-  const isServer = typeof window === "undefined";
-  let authToken =
-    initialConfig?.authToken ?? process.env.NEXT_PUBLIC_AUTH_TOKEN;
-
-  if (isServer) {
-    try {
-      const cookieStore = cookies() as unknown as ReadonlyRequestCookies;
-      authToken = cookieStore.get("auth_token")?.value ?? authToken;
-    } catch (error) {
-      logger.error("Failed to access cookies synchronously", error);
-    }
+): Promise<ApolloClient<any>> => {
+  if (serverInstance) {
+    return serverInstance;
   }
 
   const config: ApolloClientConfig = {
-    uri: process.env.NEXT_PUBLIC_GRAPHQL_API as string,
-    authToken,
-    retryAttempts: 3,
-    isServer,
+    uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:4000/graphql",
+    isServer: true,
     ...initialConfig,
   };
 
-  if (isServer) {
-    return createApolloClient(config);
-  }
-
-  if (!apolloClient) {
-    apolloClient = createApolloClient(config);
-  }
-
-  return apolloClient;
+  serverInstance = createApolloClient(config);
+  return serverInstance;
 };
 
-export const client = getApolloClient();
+/**
+ * Gets or creates a client-side Apollo Client instance
+ */
+export const getClientApolloClient = (
+  initialConfig?: Partial<ApolloClientConfig>
+): ApolloClient<any> => {
+  if (clientInstance) {
+    return clientInstance;
+  }
+
+  const config: ApolloClientConfig = {
+    uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:4000/graphql",
+    isServer: false,
+    ...initialConfig,
+  };
+
+  clientInstance = createApolloClient(config);
+  return clientInstance;
+};
+
+// For backward compatibility
+export const client = getClientApolloClient();
+
