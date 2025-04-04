@@ -33,7 +33,7 @@ const Dashboard = ({ children, title, breadcrumb }: LayoutProps) => {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
+                  <BreadcrumbLink href={`/dashboard/${title.toLowerCase()}`}>
                     {title}
                   </BreadcrumbLink>
                 </BreadcrumbItem>

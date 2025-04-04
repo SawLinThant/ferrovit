@@ -21,3 +21,25 @@ export const GET_CLINIC_ADDRESS_BY_ID = gql`
     }
   }
 `;
+
+export const GET_FILTERED_CLINIC_ADDRESSES = gql`
+  query GetAllClinicAddresses(
+    $where: clinic_addresses_bool_exp!
+    $offset: Int
+    $limit: Int
+  ) {
+    clinic_addresses(where: $where, offset: $offset, limit: $limit) {
+      id
+      address
+      phone
+      google_map_link
+      township
+      name
+    }
+    clinic_addresses_aggregate(where: $where) {
+      aggregate {
+        count
+      }
+    }
+  }
+`;

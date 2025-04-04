@@ -1,12 +1,18 @@
-import { CreateClinicAddressInput, ClinicAddress } from "@/entities/clinic_addresses.entity";
+import { CreateClinicAddressInput, ClinicAddress, ClinicAddressResponse } from "@/entities/clinic_addresses.entity";
 import { CREATE_CLINIC_ADDRESS } from "@/graphql/mutation/clinic_addresses.mutation";
-import { GET_ALL_CLINIC_ADDRESSES, GET_CLINIC_ADDRESS_BY_ID } from "@/graphql/query/clinic_addresses.query";
+import { GET_ALL_CLINIC_ADDRESSES, GET_CLINIC_ADDRESS_BY_ID, GET_FILTERED_CLINIC_ADDRESSES } from "@/graphql/query/clinic_addresses.query";
 import {
   ApolloClient,
   ApolloError,
   ServerError,
   ServerParseError,
 } from "@apollo/client";
+
+interface FetchAddressParams {
+  township?: string;
+  offset?: number;
+  limit?: number;
+}
 
 export class ClinicAddressRepository {
   private client: ApolloClient<any>;
@@ -47,6 +53,55 @@ export class ClinicAddressRepository {
       });
     }
   }
+
+  async fetchBlogs({
+        township,
+        offset = 0,
+        limit = 10,
+      }: FetchAddressParams): Promise<ClinicAddressResponse> {
+        try {
+          const where: any = {};
+          if (township) {
+            where.township = { _eq: township };
+          }
+    
+          console.log('Fetching blogs with params:', {
+            where,
+            offset,
+            limit,
+          });
+    
+          const { data } = await this.client.query<{
+            clinic_addresses: ClinicAddress[];
+            clinic_addresses_aggregate: { aggregate: { count: number } };
+          }>({
+            query: GET_FILTERED_CLINIC_ADDRESSES,
+            variables: {
+              where,
+              offset,
+              limit,
+            },
+            fetchPolicy: "network-only",
+            errorPolicy: "all",
+          });
+    
+          if (!data?.clinic_addresses) {
+            throw new Error("No addresses returned from query");
+          }
+    
+          return {
+            clinic_addresses: data.clinic_addresses,
+            total_count: data.clinic_addresses_aggregate.aggregate.count,
+          };
+        } catch (error) {
+          console.error('Error fetching addresses:', error);
+          throw new ApolloError({
+            errorMessage: "Failed to fetch addresses",
+            graphQLErrors: error instanceof ApolloError ? error.graphQLErrors : [],
+            networkError: error instanceof ApolloError ? error.networkError : null,
+          });
+        }
+      }
 
   async createClinicAddress(input: CreateClinicAddressInput): Promise<ClinicAddress> {
     try {

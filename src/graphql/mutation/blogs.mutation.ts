@@ -13,3 +13,17 @@ export const CREATE_BLOG = gql`
     }
   }
 `;
+
+export const UPDATE_BLOG = gql`
+  mutation UpdateBlog($id: uuid!, $input: blogs_set_input!) {
+    update_blogs_by_pk(pk_columns: { id: $id }, _set: $input) {
+      id
+      title
+      subtitle
+      author
+      description
+      highlight_text
+      created_at
+    }
+  }
+`;

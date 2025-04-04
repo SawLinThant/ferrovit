@@ -36,18 +36,23 @@ const createApolloClient = (config: ApolloClientConfig): ApolloClient<any> => {
     throw new Error("GraphQL API URI is required");
   }
 
-  const httpLink = new HttpLink({
+  const linkOptions = {
     uri,
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...(authToken && { Authorization: `Bearer ${authToken}` }),
     },
-    fetchOptions: {
+  };
+
+  if (!isServer) {
+    (linkOptions as any).fetchOptions = {
       mode: "cors",
       credentials: "include",
-    },
-  });
+    };
+  }
+
+  const httpLink = new HttpLink(linkOptions);
 
   const authLink = new ApolloLink((operation, forward) => {
     if (authToken) {
@@ -59,7 +64,6 @@ const createApolloClient = (config: ApolloClientConfig): ApolloClient<any> => {
     }
     return forward(operation);
   });
-
   const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
     if (graphQLErrors) {
       graphQLErrors.forEach(
@@ -74,19 +78,31 @@ const createApolloClient = (config: ApolloClientConfig): ApolloClient<any> => {
     }
     if (networkError) {
       const error = networkError as any;
-      console.log("error", error);
-      logger.error(`Network Error: ${error}`, {
+      const isCorsError =
+        error.message &&
+        (error.message.includes("CORS") ||
+          error.message.includes("Failed to fetch"));
+
+      logger.error(`Network Error: ${error.message || "Connection failed"}`, {
         operation: operation.operationName,
         statusCode: error.statusCode,
-        name: error.name,
-        stack: error.stack,
-        result: error.result,
-        response: error.response,
-        request: {
-          uri: operation.getContext().uri,
-          headers: operation.getContext().headers,
-        }
+        cors: isCorsError ? "Possible CORS issue detected" : undefined,
+        url: operation.getContext()?.uri,
       });
+
+      if (isCorsError && !isServer) {
+        console.error(`
+CORS Error Detected! 
+This happens when the API server doesn't allow requests from ${window.location.origin}.
+
+To fix this, ensure the API server includes these headers in responses:
+- Access-Control-Allow-Origin: ${window.location.origin} (or *)
+- Access-Control-Allow-Methods: POST, GET, OPTIONS
+- Access-Control-Allow-Headers: Content-Type, Authorization
+
+If you're in development, consider using a CORS proxy or browser extension.
+`);
+      }
     }
   });
 
@@ -115,11 +131,15 @@ const createApolloClient = (config: ApolloClientConfig): ApolloClient<any> => {
     ssrMode: isServer,
     defaultOptions: {
       watchQuery: {
-        fetchPolicy: (isServer ? "no-cache" : "cache-and-network") as FetchPolicy,
+        fetchPolicy: (isServer
+          ? "no-cache"
+          : "cache-and-network") as FetchPolicy,
         errorPolicy: "all",
       },
       query: {
-        fetchPolicy: (isServer ? "no-cache" : "cache-and-network") as FetchPolicy,
+        fetchPolicy: (isServer
+          ? "no-cache"
+          : "cache-and-network") as FetchPolicy,
         errorPolicy: "all",
       },
     },
@@ -159,8 +179,15 @@ export const getClientApolloClient = (
     return clientInstance;
   }
 
+  let uri =
+    process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:4000/graphql";
+
+  if (typeof window !== "undefined") {
+    uri = "/api/graphql";
+  }
+
   const config: ApolloClientConfig = {
-    uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:4000/graphql",
+    uri,
     isServer: false,
     ...initialConfig,
   };
@@ -169,6 +196,4 @@ export const getClientApolloClient = (
   return clientInstance;
 };
 
-// For backward compatibility
 export const client = getClientApolloClient();
-

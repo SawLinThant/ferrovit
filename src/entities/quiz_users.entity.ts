@@ -9,8 +9,8 @@ export interface QuizUser {
     results: {
         id: string;
         quiz_user_id: string;
-        total_points: number;
-        health_status: string;
+        total_points: number | null;
+        health_status: string | null;
     }[];
   }
   

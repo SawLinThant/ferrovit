@@ -5,7 +5,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 interface TownshipSelectProps {
-  townships: string[];
+  townships: {
+    value: string;
+    label: string;
+  }[];
   selectedTownship?: string;
 }
 
@@ -46,13 +49,13 @@ const TownshipSelect = ({ townships, selectedTownship }: TownshipSelectProps) =>
             >
               All
             </button>
-            {townships.map((township) => (
+            {townships.map((township,index) => (
               <button
-                key={township}
-                onClick={() => handleSelect(township)}
+                key={index}
+                onClick={() => handleSelect(township.value)}
                 className="w-full px-4 py-2 text-left hover:bg-gray-100 text-gray-700"
               >
-                {township}
+                {township.label}
               </button>
             ))}
           </div>

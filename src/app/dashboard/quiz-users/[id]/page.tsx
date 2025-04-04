@@ -32,7 +32,7 @@ export default async function QuizUserDetail({ params }: PageProps) {
     }
 
     return (
-      <Dashboard title="Quiz User Details" breadcrumb="Quiz Users">
+      <Dashboard title="Quiz-Users" breadcrumb="Detail">
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Quiz User Details</h2>
@@ -74,11 +74,11 @@ export default async function QuizUserDetail({ params }: PageProps) {
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium text-muted-foreground">Points</h3>
-                  <p className="text-lg">{quizUser.results[0].total_points}</p>
+                  <p className="text-lg">{quizUser.results[0]?.total_points || "not completed the quiz"}</p>
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium text-muted-foreground">Health Status</h3>
-                  <p className="text-lg">{quizUser.results[0].health_status}</p>
+                  <p className="text-lg">{quizUser.results[0]?.health_status || "not completed the quiz"}</p>
                 </div>
               </div>
 

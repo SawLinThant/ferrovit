@@ -1,83 +1,34 @@
 import Layout from '@/components/layout/Layout';
 import StoreCard from '@/components/shop/StoreCard';
 import TownshipSelect from '@/components/shop/TownshipSelect';
+import { client } from '@/graphql/client';
+import { townshipOptions } from '@/lib/constant';
+import { ClinicAddressRepository } from '@/services/clinic-addresses/clinic_addresses.repository';
+import { ClinicAddressService } from '@/services/clinic-addresses/clinic_addresses.service';
 import Image from 'next/image';
 
-// This would typically come from your database or API
-const townships = [
-  'Yangon',
-  'Mandalay',
-  'Naypyidaw',
-  'Bago',
-  'Mawlamyine',
-  'Pathein',
-];
 
-const stores = [
-  {
-    id: 1,
-    name: 'City Mart, Myaynikone',
-    address: 'Corner of Pyay Road, Shin Saw Pu, Yangon, Myanmar (Burma)',
-    phone: '+95 1 510 697',
-  },
-  {
-    id: 2,
-    name: 'City Mart, Myaynikone',
-    address: 'Corner of Pyay Road, Shin Saw Pu, Yangon, Myanmar (Burma)',
-    phone: '+95 1 510 697',
-  },
-  {
-    id: 3,
-    name: 'City Mart, Myaynikone',
-    address: 'Corner of Pyay Road, Shin Saw Pu, Yangon, Myanmar (Burma)',
-    phone: '+95 1 510 697',
-  },
-  {
-    id: 4,
-    name: 'City Mart, Myaynikone',
-    address: 'Corner of Pyay Road, Shin Saw Pu, Yangon, Myanmar (Burma)',
-    phone: '+95 1 510 697',
-  },
-  {
-    id: 5,
-    name: 'City Mart, Myaynikone',
-    address: 'Corner of Pyay Road, Shin Saw Pu, Yangon, Myanmar (Burma)',
-    phone: '+95 1 510 697',
-  },
-  {
-    id: 6,
-    name: 'City Mart, Myaynikone',
-    address: 'Corner of Pyay Road, Shin Saw Pu, Yangon, Myanmar (Burma)',
-    phone: '+95 1 510 697',
-  },
-  {
-    id: 7,
-    name: 'City Mart, Myaynikone',
-    address: 'Corner of Pyay Road, Shin Saw Pu, Yangon, Myanmar (Burma)',
-    phone: '+95 1 510 697',
-  },
-  {
-    id: 8,
-    name: 'City Mart, Myaynikone',
-    address: 'Corner of Pyay Road, Shin Saw Pu, Yangon, Myanmar (Burma)',
-    phone: '+95 1 510 697',
-  },
-];
-
-type SearchParamsType = Promise<{ township?: string }>;
+type SearchParamsType = Promise<{ township?: string, page?: string }>;
 
 export default async function ShopDirectories({ searchParams }: { searchParams: SearchParamsType }) {
   const resolvedSearchParams = await searchParams;
   const selectedTownship = resolvedSearchParams.township;
+  const addressRepository = new ClinicAddressRepository(client);
+  const clinicService = new ClinicAddressService(addressRepository);
 
-  const filteredStores = selectedTownship
-    ? stores.filter(store => store.address.includes(selectedTownship))
-    : stores;
+  const processedSearchParams = {
+    ...resolvedSearchParams,
+    township: resolvedSearchParams.township === "All" ? undefined : resolvedSearchParams.township,
+    page: Number(resolvedSearchParams.page) || 1,
+    pageSize: 10,
+  };
+
+
+  const address = clinicService.getFilteredClinicAddresses(processedSearchParams)
 
   return (
     <Layout>
       <div className="min-h-screen">
-        {/* Map Section */}
         <div className="relative w-full h-[400px] bg-black/50">
           <Image
             src="/images/map.jpg"
@@ -89,7 +40,7 @@ export default async function ShopDirectories({ searchParams }: { searchParams: 
             <h1 className="text-4xl font-bold text-red-600 mb-8">Find a store</h1>
             <div className="w-full max-w-md px-4">
               <TownshipSelect
-                townships={townships}
+                townships={townshipOptions}
                 selectedTownship={selectedTownship}
               />
             </div>
@@ -105,7 +56,7 @@ export default async function ShopDirectories({ searchParams }: { searchParams: 
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredStores.map((store) => (
+            {(await address).clinic_addresses.map((store) => (
               <StoreCard
                 key={store.id}
                 name={store.name}

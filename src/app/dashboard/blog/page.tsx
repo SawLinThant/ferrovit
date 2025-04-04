@@ -8,6 +8,9 @@ import QuizUserFiltersWrapper from "@/components/quiz-users/QuizUserFiltersWrapp
 import { QuizUser, QuizUsersResponse } from "@/entities/quiz_users.entity";
 import { getServerAuthToken } from "@/lib/server/auth";
 import { redirect } from "next/navigation";
+import { BlogRepository } from "@/services/blogs/blogs.repository";
+import { BlogService } from "@/services/blogs/blogs.service";
+import { BlogColumns } from "@/components/common/custom-table/columns/blog";
 
 interface PageProps {
   searchParams: Promise<{
@@ -22,8 +25,10 @@ export default async function QuizUsers({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams;
   const authToken = await getServerAuthToken();
   const client = await getServerApolloClient({ authToken });
-  const quizUserRepository = new QuizUserRepository(client);
-  const quizUserService = new QuizUserService(quizUserRepository);
+  const blogRepository = new BlogRepository(client);
+  const blogService = new BlogService(blogRepository);
+
+  
 
   const processedSearchParams = {
     ...resolvedSearchParams,
@@ -32,16 +37,17 @@ export default async function QuizUsers({ searchParams }: PageProps) {
     pageSize: 10,
   };
 
-  const quizUsers = await quizUserService.getFilteredQuizUserse(processedSearchParams);
+  const blogs = blogService.getFilteredQuizUserse(processedSearchParams)
+
 
   return (
-    <Dashboard title="Quiz-Users" breadcrumb="participants">
-      <h2 className="text-2xl font-bold mb-6">Quiz Users</h2>
-      <QuizUserFiltersWrapper />
+    <Dashboard title="Blog" breadcrumb="blog list">
+      <h2 className="text-2xl font-bold mb-6">Blogs</h2>
+      {/* <QuizUserFiltersWrapper /> */}
       <DataTable
-        columns={QuizUserColumns}
-        data={quizUsers.quiz_users}
-        totalCount={quizUsers.total_count}
+        columns={BlogColumns}
+        data={(await blogs).blogs}
+        totalCount={(await blogs).total_count}
         page={processedSearchParams.page}
         pageSize={processedSearchParams.pageSize}
       />

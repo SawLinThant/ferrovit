@@ -27,3 +27,22 @@ export const GET_BLOG_BY_ID = gql`
     }
   }
 `;
+
+export const GET_FILTERED_BLOGS = gql`
+  query GetAllBlogs($where: blogs_bool_exp!, $offset: Int, $limit: Int) {
+    blogs(where: $where, offset: $offset, limit: $limit) {
+      id
+      title
+      subtitle
+      author
+      created_at
+      description
+      highlight_text
+    }
+    blogs_aggregate(where: $where) {
+      aggregate {
+        count
+      }
+    }
+  }
+`;

@@ -6,8 +6,11 @@ import {
   BookOpen,
   Bot,
   Command,
+  FileUser,
   Frame,
   GalleryVerticalEnd,
+  Hospital,
+  LayoutPanelTop,
   Map,
   PieChart,
   Settings2,
@@ -26,62 +29,61 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-// This is sample data.
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: "Ferrovit",
+    email: "ferrovit@gmail.com",
+    avatar: "/images/logo.png",
   },
   teams: [
     {
-      name: "Acme Inc",
+      name: "Ferrovit",
       logo: GalleryVerticalEnd,
-      plan: "Enterprise",
+      plan: "Dashboard",
     },
     {
-      name: "Acme Corp.",
+      name: "Ferrovit",
       logo: AudioWaveform,
-      plan: "Startup",
+      plan: "",
     },
     {
-      name: "Evil Corp.",
+      name: "Ferrovit",
       logo: Command,
-      plan: "Free",
+      plan: "",
     },
   ],
   navMain: [
     {
       title: "Quiz Users",
       url: "#",
-      icon: SquareTerminal,
+      icon: FileUser,
       isActive: true,
       items: [
         {
           title: "Participants",
-          url: "#",
+          url: "/dashboard/quiz-users",
         },
       ],
     },
     {
       title: "Blogs",
       url: "#",
-      icon: Bot,
+      icon: LayoutPanelTop,
       items: [
         {
           title: "Blog-Lists",
-          url: "#",
+          url: "/dashboard/blog",
         },
         {
           title: "Blog-Create",
-          url: "#",
+          url: "/dashboard/blog/create",
         },
       ],
     },
     {
       title: "Clinic",
       url: "#",
-      icon: BookOpen,
+      icon: Hospital,
       items: [
         {
           title: "Address-List",

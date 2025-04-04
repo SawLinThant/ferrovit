@@ -1,5 +1,11 @@
-import { CreateClinicAddressInput, ClinicAddress } from '@/entities/clinic_addresses.entity';
+import { CreateClinicAddressInput, ClinicAddress, ClinicAddressResponse } from '@/entities/clinic_addresses.entity';
 import { ClinicAddressRepository } from './clinic_addresses.repository';
+
+interface FetchAddressParams {
+  township?: string;
+  page?: number;
+  pageSize?: number;
+}
 
 export class ClinicAddressService {
   private repository: ClinicAddressRepository;
@@ -32,6 +38,20 @@ export class ClinicAddressService {
     return clinicAddress;
   }
 
+    async getFilteredClinicAddresses({
+      township,
+      page = 1,
+      pageSize = 10,
+    }: FetchAddressParams): Promise<ClinicAddressResponse> {
+      const offset = (page - 1) * pageSize;
+  
+      return await this.repository.fetchBlogs({
+        township,
+        offset,
+        limit: pageSize,
+      });
+    }
+
   async createClinicAddress(input: CreateClinicAddressInput): Promise<ClinicAddress> {
     if (!input.address || !input.phone || !input.google_map_link) {
       throw new Error('Address, phone, and Google Map link are required');
@@ -47,6 +67,8 @@ export class ClinicAddressService {
       address: input.address.trim(),
       phone: input.phone.trim(),
       google_map_link: input.google_map_link.trim(),
+      township: input.township,
+      name: input.name
     };
 
     return await this.repository.createClinicAddress(sanitizedInput);
