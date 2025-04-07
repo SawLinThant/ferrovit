@@ -25,7 +25,7 @@ export class ClinicAddressService {
     }));
   }
 
-  async getClinicAddressById(id: string): Promise<ClinicAddress> {
+  async getClinicById(id: string): Promise<ClinicAddress> {
     if (!id || typeof id !== 'string') {
       throw new Error('Invalid clinic address ID');
     }
@@ -38,26 +38,23 @@ export class ClinicAddressService {
     return clinicAddress;
   }
 
-    async getFilteredClinicAddresses({
+  async getFilteredClinicAddresses({
+    township,
+    page = 1,
+    pageSize = 10,
+  }: FetchAddressParams): Promise<ClinicAddressResponse> {
+    const offset = (page - 1) * pageSize;
+
+    return await this.repository.fetchClinic({
       township,
-      page = 1,
-      pageSize = 10,
-    }: FetchAddressParams): Promise<ClinicAddressResponse> {
-      const offset = (page - 1) * pageSize;
-  
-      return await this.repository.fetchBlogs({
-        township,
-        offset,
-        limit: pageSize,
-      });
-    }
+      offset,
+      limit: pageSize,
+    });
+  }
 
   async createClinicAddress(input: CreateClinicAddressInput): Promise<ClinicAddress> {
     if (!input.address || !input.phone || !input.google_map_link) {
       throw new Error('Address, phone, and Google Map link are required');
-    }
-    if (!/^\+?[1-9]\d{1,14}$/.test(input.phone)) {
-      throw new Error('Invalid phone number format');
     }
     if (!input.google_map_link.startsWith('http')) {
       throw new Error('Google Map link must be a valid URL');
@@ -72,5 +69,30 @@ export class ClinicAddressService {
     };
 
     return await this.repository.createClinicAddress(sanitizedInput);
+  }
+
+  async updateClinicAddress(id: string, input: Partial<ClinicAddress>): Promise<ClinicAddress> {
+    if (!id || typeof id !== 'string') {
+      throw new Error('Invalid clinic address ID');
+    }
+
+    if (!input.address && !input.phone && !input.google_map_link && !input.township && !input.name) {
+      throw new Error('At least one field must be provided for update');
+    }
+
+    const sanitizedInput: Partial<ClinicAddress> = {};
+    
+    if (input.address) sanitizedInput.address = input.address.trim();
+    if (input.phone) sanitizedInput.phone = input.phone.trim();
+    if (input.google_map_link) {
+      if (!input.google_map_link.startsWith('http')) {
+        throw new Error('Google Map link must be a valid URL');
+      }
+      sanitizedInput.google_map_link = input.google_map_link.trim();
+    }
+    if (input.township) sanitizedInput.township = input.township.trim();
+    if (input.name) sanitizedInput.name = input.name.trim();
+
+    return await this.repository.updateClinicAddress(id, sanitizedInput);
   }
 }

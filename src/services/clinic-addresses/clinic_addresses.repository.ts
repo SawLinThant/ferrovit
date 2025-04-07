@@ -1,5 +1,5 @@
 import { CreateClinicAddressInput, ClinicAddress, ClinicAddressResponse } from "@/entities/clinic_addresses.entity";
-import { CREATE_CLINIC_ADDRESS } from "@/graphql/mutation/clinic_addresses.mutation";
+import { CREATE_CLINIC_ADDRESS, UPDATE_CLINIC_ADDRESS } from "@/graphql/mutation/clinic_addresses.mutation";
 import { GET_ALL_CLINIC_ADDRESSES, GET_CLINIC_ADDRESS_BY_ID, GET_FILTERED_CLINIC_ADDRESSES } from "@/graphql/query/clinic_addresses.query";
 import {
   ApolloClient,
@@ -54,7 +54,7 @@ export class ClinicAddressRepository {
     }
   }
 
-  async fetchBlogs({
+  async fetchClinic({
         township,
         offset = 0,
         limit = 10,
@@ -81,7 +81,7 @@ export class ClinicAddressRepository {
               offset,
               limit,
             },
-            fetchPolicy: "network-only",
+            fetchPolicy: "no-cache",
             errorPolicy: "all",
           });
     
@@ -120,6 +120,29 @@ export class ClinicAddressRepository {
     } catch (error) {
       throw new ApolloError({
         errorMessage: "Failed to create clinic address",
+        graphQLErrors: error instanceof ApolloError ? error.graphQLErrors : [],
+        networkError: this.getNetworkError(error),
+      });
+    }
+  }
+
+  async updateClinicAddress(id: string, input: Partial<ClinicAddress>): Promise<ClinicAddress> {
+    try {
+      const { data } = await this.client.mutate<{
+        update_clinic_addresses_by_pk: ClinicAddress;
+      }>({
+        mutation: UPDATE_CLINIC_ADDRESS,
+        variables: { id, input },
+      });
+
+      if (!data?.update_clinic_addresses_by_pk) {
+        throw new Error("Clinic address update returned no data");
+      }
+
+      return data.update_clinic_addresses_by_pk;
+    } catch (error) {
+      throw new ApolloError({
+        errorMessage: "Failed to update clinic address",
         graphQLErrors: error instanceof ApolloError ? error.graphQLErrors : [],
         networkError: this.getNetworkError(error),
       });

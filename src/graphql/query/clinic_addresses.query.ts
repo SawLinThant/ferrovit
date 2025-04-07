@@ -16,8 +16,10 @@ export const GET_CLINIC_ADDRESS_BY_ID = gql`
     clinic_addresses_by_pk(id: $id) {
       id
       address
+      name
       phone
       google_map_link
+      township
     }
   }
 `;

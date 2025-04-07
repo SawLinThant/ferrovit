@@ -22,7 +22,6 @@ export const townshipOptions = [
     { value: "Thingangyun", label: "Thingangyun" },
     { value: "North Okkalapa", label: "North Okkalapa" },
     { value: "South Okkalapa", label: "South Okkalapa" },
-    { value: "East Dagon", label: "East Dagon" },
     { value: "Shwepyitha", label: "Shwepyitha" },
     { value: "Hmawbi", label: "Hmawbi" },
     { value: "Hlegu", label: "Hlegu" },

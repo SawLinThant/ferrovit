@@ -87,11 +87,11 @@ const data = {
       items: [
         {
           title: "Address-List",
-          url: "#",
+          url: "/dashboard/clinic",
         },
         {
           title: "Address-Create",
-          url: "#",
+          url: "/dashboard/clinic/create",
         },
       ],
     },
