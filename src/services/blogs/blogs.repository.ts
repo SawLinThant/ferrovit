@@ -35,7 +35,7 @@ export class BlogRepository {
     try {
       const { data } = await this.client.query<{ blogs: Blog[] }>({
         query: GET_ALL_BLOGS,
-        fetchPolicy: "network-only",
+        fetchPolicy: "no-cache",
       });
       return data.blogs;
     } catch (error) {
@@ -97,7 +97,7 @@ export class BlogRepository {
           offset,
           limit,
         },
-        fetchPolicy: "network-only",
+        fetchPolicy: "no-cache",
         errorPolicy: "all",
       });
 

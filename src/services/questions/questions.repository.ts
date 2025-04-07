@@ -19,7 +19,7 @@ export class QuestionRepository {
     try {
       const { data } = await this.client.query<{ questions: Question[] }>({
         query: GET_ALL_QUESTIONS,
-        fetchPolicy: "network-only",
+        fetchPolicy: "no-cache",
       });
       return data.questions;
     } catch (error) {
@@ -36,7 +36,7 @@ export class QuestionRepository {
       const { data } = await this.client.query<{ questions_by_pk: Question | null }>({
         query: GET_QUESTION_BY_ID,
         variables: { id },
-        fetchPolicy: "network-only",
+        fetchPolicy: "no-cache",
       });
       return data.questions_by_pk;
     } catch (error) {
@@ -53,7 +53,7 @@ export class QuestionRepository {
       const { data } = await this.client.query<{ questions: Question[] }>({
         query: GET_QUESTION_BY_QUESTION_NO,
         variables: { question_no },
-        fetchPolicy: "network-only",
+        fetchPolicy: "no-cache",
       });
 
       if (!data.questions || data.questions.length === 0) {

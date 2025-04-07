@@ -10,6 +10,7 @@ export const GET_ALL_BLOGS = gql`
       created_at
       description
       highlight_text
+      image
     }
   }
 `;
@@ -24,6 +25,7 @@ export const GET_BLOG_BY_ID = gql`
       created_at
       description
       highlight_text
+      image
     }
   }
 `;

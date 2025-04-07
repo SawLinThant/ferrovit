@@ -19,9 +19,21 @@ interface RelatedPost {
 }
 
 type Params = Promise<{ slug: string }>;
+type SearchParams = Promise<{ page?: string }>;
 
-export default async function BlogDetail({ params }: { params: Params }) {
+const POSTS_PER_PAGE = 8;
+
+export default async function BlogDetail({ 
+  params,
+  searchParams 
+}: { 
+  params: Params;
+  searchParams: SearchParams;
+}) {
   const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+  const currentPage = Number(resolvedSearchParams.page) || 1;
+  
   const blogRepository = new BlogRepository(client);
   const blogService = new BlogService(blogRepository);
   const blogPost = await blogService.getBlogById(resolvedParams.slug);
@@ -30,9 +42,16 @@ export default async function BlogDetail({ params }: { params: Params }) {
     (blog) => blog.id === resolvedParams.slug
   );
 
-  const relatedBlogs = allBlogs.filter(
+  // Filter out current blog and implement pagination
+  const filteredBlogs = allBlogs.filter(
     (blog) => blog.id !== resolvedParams.slug
-  ).slice(0,8);
+  );
+  
+  const totalPages = Math.ceil(filteredBlogs.length / POSTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+  const endIndex = startIndex + POSTS_PER_PAGE;
+  
+  const relatedBlogs = filteredBlogs.slice(startIndex, endIndex);
 
   const previousBlog = currentIndex > 0 ? allBlogs[currentIndex - 1] : null;
   const nextBlog =
@@ -124,7 +143,7 @@ export default async function BlogDetail({ params }: { params: Params }) {
           {/* Blog Image */}
           <div className="relative w-full h-[600px] mb-12">
             <Image
-              src="/images/background.jpg"
+              src={blogPost.image || ""}
               alt={blogPost.title}
               fill
               className="md:object-contain object-cover"
@@ -174,12 +193,26 @@ export default async function BlogDetail({ params }: { params: Params }) {
                   Related Blog Posts
                 </h2>
                 <div className="flex space-x-4">
-                  <button className="w-10 h-10 rounded-xl border border-red-600 flex items-center rotate-180 justify-center bg-red-600 text-red-500 hover:bg-red-600 hover:text-white hover:cursor-pointer">
-                    <ChevronRightIcon height="10" width="10" color="white" />
-                  </button>
-                  <button className="w-10 h-10 rounded-xl border border-red-600 flex items-center justify-center bg-red-600 text-red-500 hover:bg-red-600 hover:text-white hover:cursor-pointer">
-                    <ChevronRightIcon height="10" width="10" color="white" />
-                  </button>
+                  <Link
+                    href={`/blogs/${resolvedParams.slug}?page=${Math.max(1, currentPage - 1)}`}
+                    className={`w-10 h-10 rounded-xl border flex items-center rotate-180 justify-center ${
+                      currentPage === 1
+                        ? "border-gray-300 bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "border-red-600 bg-red-600 text-white hover:bg-red-600 hover:text-white hover:cursor-pointer"
+                    }`}
+                  >
+                    <ChevronRightIcon height="10" width="10" color={currentPage === 1 ? "gray" : "white"} />
+                  </Link>
+                  <Link
+                    href={`/blogs/${resolvedParams.slug}?page=${Math.min(totalPages, currentPage + 1)}`}
+                    className={`w-10 h-10 rounded-xl border flex items-center justify-center ${
+                      currentPage === totalPages
+                        ? "border-gray-300 bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "border-red-600 bg-red-600 text-white hover:bg-red-600 hover:text-white hover:cursor-pointer"
+                    }`}
+                  >
+                    <ChevronRightIcon height="10" width="10" color={currentPage === totalPages ? "gray" : "white"} />
+                  </Link>
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -189,11 +222,16 @@ export default async function BlogDetail({ params }: { params: Params }) {
                     title={blog.title}
                     category={blog.subtitle || ""}
                     excerpt={blog.highlight_text || ""}
-                    imageUrl="/images/blog-sample.png"
+                    imageUrl={blog.image || ""}
                     url={`/blogs/${blog.id}`}
                   />
                 ))}
               </div>
+              {relatedBlogs.length === 0 && (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">No related posts found.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

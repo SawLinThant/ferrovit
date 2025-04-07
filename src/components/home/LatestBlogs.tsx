@@ -85,14 +85,14 @@ export default async function LatestBlogs() {
       <div className="container mx-auto px-8">
         <div className="flex justify-between items-center mb-12">
           <h2 className="text-3xl font-bold text-red-600">Our Latest Blogs</h2>
-          <div className="flex space-x-4">
+          {/* <div className="flex space-x-4">
             <button className="w-10 h-10 rounded-xl border border-red-600 flex items-center rotate-180 justify-center bg-red-600 text-red-500 hover:bg-red-600 hover:text-white hover:cursor-pointer">
               <ChevronRightIcon height="10" width="10" color="white" />
             </button>
             <button className="w-10 h-10 rounded-xl border border-red-600 flex items-center justify-center bg-red-600 text-red-500 hover:bg-red-600 hover:text-white hover:cursor-pointer">
               <ChevronRightIcon height="10" width="10" color="white" />
             </button>
-          </div>
+          </div> */}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {latestBlogs.map((blog, index) => (
@@ -101,7 +101,7 @@ export default async function LatestBlogs() {
               title={blog.title}
               category={blog.subtitle || ""}
               excerpt={blog.highlight_text || ""}
-              imageUrl="/images/blog-sample.png"
+              imageUrl={blog.image || ""}
               url={`/blogs/${blog.id}`}
             />
           ))}

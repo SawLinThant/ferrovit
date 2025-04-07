@@ -27,7 +27,7 @@ export class QuizUserRepository {
     try {
       const { data } = await this.client.query<{ quiz_users: QuizUser[] }>({
         query: GET_ALL_QUIZ_USERS,
-        fetchPolicy: "network-only",
+        fetchPolicy: "no-cache",
       });
       return data.quiz_users;
     } catch (error) {
@@ -44,7 +44,7 @@ export class QuizUserRepository {
       const { data } = await this.client.query<{ quiz_users_by_pk: QuizUser | null }>({
         query: GET_QUIZ_USER_BY_ID,
         variables: { id },
-        fetchPolicy: "network-only",
+        fetchPolicy: "no-cache",
       });
       return data.quiz_users_by_pk;
     } catch (error) {
@@ -116,7 +116,7 @@ export class QuizUserRepository {
           offset,
           limit,
         },
-        fetchPolicy: "network-only",
+        fetchPolicy: "no-cache",
         errorPolicy: "all",
       });
 

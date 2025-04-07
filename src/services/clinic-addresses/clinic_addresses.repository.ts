@@ -42,7 +42,7 @@ export class ClinicAddressRepository {
       const { data } = await this.client.query<{ clinic_addresses_by_pk: ClinicAddress | null }>({
         query: GET_CLINIC_ADDRESS_BY_ID,
         variables: { id },
-        fetchPolicy: "network-only",
+        fetchPolicy: "no-cache",
       });
       return data.clinic_addresses_by_pk;
     } catch (error) {
