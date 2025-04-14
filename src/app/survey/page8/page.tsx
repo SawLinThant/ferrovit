@@ -41,7 +41,7 @@ export default async function SurveyPage8({
       }
     }
     
-   // redirect(`/survey/results?quiz_user_id=${quizUserId}`);
+    redirect(`/get-result?quiz_user_id=${quizUserId}`);
   }
 
   const options =
