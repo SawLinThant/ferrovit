@@ -14,6 +14,7 @@ import {
   Map,
   PieChart,
   Settings2,
+  SquareChartGantt,
   SquareTerminal,
 } from "lucide-react"
 
@@ -54,10 +55,20 @@ const data = {
   ],
   navMain: [
     {
+      title: "Overview",
+      url: "#",
+      icon: SquareChartGantt,
+      items: [
+        {
+          title: "Analysis",
+          url: "/dashboard/overview",
+        },
+      ],
+    },
+    {
       title: "Quiz Users",
       url: "#",
       icon: FileUser,
-      isActive: true,
       items: [
         {
           title: "Participants",

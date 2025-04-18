@@ -37,7 +37,7 @@ export default async function QuizUsers({ searchParams }: PageProps) {
   return (
     <Dashboard title="Quiz-Users" breadcrumb="participants">
       <h2 className="text-2xl font-bold mb-6">Quiz Users</h2>
-      <QuizUserFiltersWrapper />
+      <QuizUserFiltersWrapper quizUsers={quizUsers.quiz_users}/>
       <DataTable
         columns={QuizUserColumns}
         data={quizUsers.quiz_users}

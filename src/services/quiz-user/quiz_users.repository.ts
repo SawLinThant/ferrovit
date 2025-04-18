@@ -89,7 +89,7 @@ export class QuizUserRepository {
     try {
       const where: any = {};
       if (phone) {
-        where.phone = { _eq: phone };
+        where.phone = {  _ilike: `%${phone}%` };
       }
       if (address) {
         where.address = { _eq: address };

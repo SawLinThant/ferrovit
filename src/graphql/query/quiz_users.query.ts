@@ -9,6 +9,12 @@ export const GET_ALL_QUIZ_USERS = gql`
       phone
       address
       created_at
+       results {
+        id
+        quiz_user_id
+        total_points
+        health_status
+      }
     }
   }
 `;
@@ -43,6 +49,12 @@ export const GET_FILTERED_QUIZ_USERS = gql`
       phone
       address
       created_at
+       results {
+        id
+        quiz_user_id
+        total_points
+        health_status
+      }
     }
     quiz_users_aggregate(where: $where) {
       aggregate {

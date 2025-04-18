@@ -6,8 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search } from "lucide-react";
+import { QuizUser } from "@/entities/quiz_users.entity";
 
-export default function QuizUserFiltersWrapper() {
+interface FilterProps {
+  quizUsers: QuizUser[]
+}
+
+export default function QuizUserFiltersWrapper({quizUsers}: FilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [phone, setPhone] = useState(searchParams.get("phone") || "");
@@ -16,6 +21,7 @@ export default function QuizUserFiltersWrapper() {
   const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
   const pageSize = 10;
 
+  console.log("Quiz Users:", quizUsers);
   const handleSearch = () => {
     const params = new URLSearchParams(searchParams.toString());
     if (phone) {
@@ -23,7 +29,7 @@ export default function QuizUserFiltersWrapper() {
     } else {
       params.delete("phone");
     }
-    params.set("page", "1"); // Reset to first page when searching
+    params.set("page", "1"); 
     router.push(`?${params.toString()}`);
   };
 
@@ -31,6 +37,19 @@ export default function QuizUserFiltersWrapper() {
     if (e.key === "Enter") {
       handleSearch();
     }
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDate = e.target.value;
+    setCreated_at(newDate);
+    const params = new URLSearchParams(searchParams.toString());
+    if (newDate) {
+      params.set("created_at", newDate);
+    } else {
+      params.delete("created_at");
+    }
+    params.set("page", "1");
+    router.push(`?${params.toString()}`);
   };
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -42,8 +61,43 @@ export default function QuizUserFiltersWrapper() {
     } else {
       params.set("address", newAddress);
     }
-    params.set("page", "1"); // Reset to first page when changing address
+    params.set("page", "1"); 
     router.push(`?${params.toString()}`);
+  };
+
+  const handleExportCSV = () => {
+    if (!quizUsers || quizUsers.length === 0) {
+      console.log("No quiz users data to export");
+      return;
+    }
+
+    const filteredData = quizUsers.map((user) => ({
+      "ID": user.id,
+      "Phone": user.phone,
+      "Address": user.address,
+      "Created At": user.created_at,
+      "Total Points": user.results?.[0]?.total_points?.toString() || "Incomplete",
+      "Health Status": user.results?.[0]?.health_status || "Incomplete",
+    }));
+
+    const headers = Object.keys(filteredData[0]);
+
+    const csvRows = [
+      headers.join(","),
+      ...filteredData.map((row: any) =>
+        headers.map((header) => JSON.stringify(row[header] || "")).join(",")
+      ),
+    ];
+
+    const csvString = csvRows.join("\n");
+
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.setAttribute("href", url);
+    a.setAttribute("download", "quiz_users.csv");
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const totalPages = Math.ceil(Number(searchParams.get("totalCount") || 0) / pageSize);
@@ -84,6 +138,11 @@ export default function QuizUserFiltersWrapper() {
   return (
     <Card className="mb-6">
       <CardContent className="pt-6">
+        <div className="mb-4 w-full flex justify-end items-center">
+          <Button onClick={handleExportCSV} variant="outline">
+            Export to CSV
+          </Button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative">
             <Input
@@ -118,7 +177,7 @@ export default function QuizUserFiltersWrapper() {
           <Input
             type="date"
             value={created_at}
-            onChange={(e) => setCreated_at(e.target.value)}
+            onChange={handleDateChange}
             className="w-full"
           />
         </div>

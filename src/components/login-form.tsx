@@ -47,7 +47,7 @@ export function LoginForm({
         }
 
         localStorage.setItem("token", response.token); 
-        router.push("/dashboard/quiz-users"); 
+        router.push("/dashboard/overview"); 
       } catch (err: any) {
         setError(err.message || "An error occurred during login");
       }

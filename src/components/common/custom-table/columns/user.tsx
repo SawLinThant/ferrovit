@@ -25,7 +25,7 @@ export const QuizUserColumns: ColumnDef<QuizUser>[] = [
     header: () => <div className="text-left">Date</div>,
     cell: ({ row }) => {
       return (
-        <span className="">{row.original.created_at.toLocaleString()}</span>
+        <span className="">{new Date(row.original.created_at).toLocaleDateString()}</span>
       );
     },
   },
