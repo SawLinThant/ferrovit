@@ -7,7 +7,10 @@ export const GET_ALL_USERS = gql`
       name
       phone
       email
+<<<<<<< HEAD
       gender
+=======
+>>>>>>> upstream/main
     }
   }
 `;

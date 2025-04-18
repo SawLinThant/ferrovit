@@ -7,7 +7,10 @@ export const CREATE_USER = gql`
       name
       phone
       email
+<<<<<<< HEAD
       gender
+=======
+>>>>>>> upstream/main
     }
   }
 `;
